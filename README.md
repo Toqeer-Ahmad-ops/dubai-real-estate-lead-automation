@@ -36,7 +36,7 @@ Production-grade WhatsApp RAG Bot for Dubai Real Estate — Voice notes (0:02) +
 
 ## 🏗 Architecture – Day 8 Persistence + Scoring
 
-![Architecture](docs/architecture-day8-gemini-3-5-flash-corrected.webp)
+![Architecture](docs/architecture-day8-gemini-3-5-flash-corrected.jpg)
 
 ```mermaid
 flowchart TD
@@ -101,7 +101,7 @@ FROM (SELECT 53 as grounded_count, 5 as fallback_count) t;
 ## 📸 Screenshots
 
 ### 1. Architecture 4K – Persistence + Scoring – Gemini 3.5 Flash Corrected (Main)
-![Architecture 4K](docs/screenshots/architecture-day8-gemini-3-5-flash-corrected.webp)
+![Architecture 4K](docs/screenshots/architecture-day8-gemini-3-5-flash-corrected.jpg)
 
 ### 2. Stitched Workflow 4K – Wiring Fix ID#1884 Before/After – LinkedIn Hero
 ![Stitched Workflow 4K](docs/screenshots/workflow-stitched-4k-linkedin.png)
