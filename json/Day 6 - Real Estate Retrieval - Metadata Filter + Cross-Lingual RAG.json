@@ -1,0 +1,552 @@
+{
+  "name": "Day 6 - Real Estate Retrieval - Metadata Filter + Cross-Lingual RAG",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "b6a6697f-0f00-4b78-86e7-edfa9b416f53",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "https://yourdomain.ae"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        64,
+        496
+      ],
+      "id": "d4ff5ea3-8e9d-4f9f-8427-c990423336aa",
+      "name": "Webhook",
+      "webhookId": "b6a6697f-0f00-4b78-86e7-edfa9b416f53"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1/models/gemini-embedding-2:embedContent",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googlePalmApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { \"content\": { \"parts\": [{\"text\": $json.question}] }, \"outputDimensionality\": 768 } }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        736,
+        496
+      ],
+      "id": "abb37520-9e01-4789-9d75-b3488772b622",
+      "name": "Generate Query Embedding",
+      "retryOnFail": true,
+      "waitBetweenTries": 1500,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "24HMO98yb3N7ucpr",
+          "name": "Gemini Toqeer Prod"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://pnafbhfijmaaxsertzof.supabase.co/rest/v1/rpc/match_documents",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "query_embedding",
+              "value": "={{ $('Validate Query Embedding').first().json.query_embedding.values }}"
+            },
+            {
+              "name": "match_count",
+              "value": "={{3}}"
+            },
+            {
+              "name": "filter",
+              "value": "={{ $json.filter }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1408,
+        496
+      ],
+      "id": "9fd6f6f7-b400-48bd-9daa-a0c57b954a22",
+      "name": "Retrieve Similar Chunks",
+      "alwaysOutputData": true,
+      "retryOnFail": true,
+      "waitBetweenTries": 1500,
+      "credentials": {
+        "supabaseApi": {
+          "id": "uwAmK3QR0J2Wd1go",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googlePalmApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ {\n  contents: [{\n    parts: [{\n      text: \"You are Dubai Real Estate Fees expert. Based on following content, answer question in SAME language as question.\\n\\nDocument Content:\\n\" + $json.retrieval_context + \"\\n\\nQuestion: \" + $json.question + \"\\nLanguage: \" + $json.language + \"\\n\\nRULES:\\n1. SAME language as Question - Arabic question => Arabic answer\\n2. Keep numbers exact: 4%, AED 580, 0.25%+AED 290\\n3. Cite: [source: Dubai DLD Fees 2026, page: 1]\\n4. Max 3 lines for WhatsApp\"\n    }]\n  }],\n  generationConfig: { temperature: 0.1, maxOutputTokens: 300 }\n} }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1856,
+        496
+      ],
+      "id": "4ea2d945-92ae-4565-815f-2a9b00255097",
+      "name": "Generate Grounded Answer",
+      "retryOnFail": true,
+      "waitBetweenTries": 5000,
+      "maxTries": 3,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "24HMO98yb3N7ucpr",
+          "name": "Gemini Toqeer Prod"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Helper to safely get node data without crashing if name has 01 prefix\nfunction getNodeJson(nameOptions) {\n  for (const name of nameOptions) {\n    try {\n      const node = $(name).first().json;\n      if (node) return node;\n    } catch (e) { /* try next name */ }\n  }\n  return {};\n}\n\n// STEP 1: Get incoming data - try multiple name variants to avoid \"Referenced node doesn't exist\"\nconst body = $input.first().json?.body || $input.first().json || {};\n\n// STEP 2: Get validation - try with and without 01 prefix\nconst validation = getNodeJson([\n  '01 Validation-CorrelationID',\n  'Validation-CorrelationID',\n  'Validation Correlation ID',\n  '01 Validation'\n]);\n\n// STEP 3: Get retrieval context - Build Retrieval Context node\nconst retrieval = getNodeJson([\n  'Build Retrieval Context',\n  'Build Retrieval',\n  '08 Build Retrieval Context'\n]);\n\n// STEP 4: Get Gemini output - Generate Grounded Answer node\nconst geminiOutput = getNodeJson([\n  'Generate Grounded Answer',\n  'Grounded Generation',\n  'Generate Grounded',\n  '09 Generate Grounded Answer'\n]);\n\n// STEP 5: Correlation ID for tracing\nconst correlation_id = body.correlation_id || validation.correlation_id || $execution.id;\n\n// STEP 6: Latency\nconst latency_ms = Date.now() - (validation.start_time || Date.now());\n\n// STEP 7: Final project - fix General bug\nconst explicitProject = body.filter?.project || body.project;\nconst autoDetectedProject = retrieval.auto_project || validation.detected_project;\nconst foundInDocs = retrieval.sources?.[0]?.source;\nconst finalProject = explicitProject || autoDetectedProject || foundInDocs || \"dubai dld fees 2026\";\n\n// STEP 8: Extract answer with rate limit handling\nlet answer = \"I could not find this information in the uploaded documents.\";\nlet isError = false;\n\nif (geminiOutput.error ||!geminiOutput.candidates) {\n  const lang = retrieval.language || body.language || validation.language_hint || \"en\";\n  if (lang === \"ar\" || lang.startsWith(\"ar\")) {\n    answer = \"عذراً، النظام مشغول حالياً. حاول بعد 20 ثانية. [source: Dubai DLD Fees 2026, page: 1]\";\n  } else {\n    answer = \"System busy, retry after 20 seconds. [source: Dubai DLD Fees 2026, page: 1]\";\n  }\n  isError = true;\n} else {\n  answer = geminiOutput.candidates[0]?.content?.parts?.[0]?.text || geminiOutput.answer || answer;\n}\n\n// STEP 9: Token usage for cost\nconst promptTokens = geminiOutput.usageMetadata?.promptTokenCount || 0;\nconst completionTokens = geminiOutput.usageMetadata?.candidatesTokenCount || 0;\nconst totalTokens = geminiOutput.usageMetadata?.totalTokenCount || 0;\n\n// STEP 10: Final response - Day 7 receives this\nreturn [{\n  json: {\n    success:!isError,\n    request_id: correlation_id,\n    question: retrieval.question || body.question || \"\",\n    answer: answer,\n    sources: retrieval.sources || [{source: 'Dubai DLD Fees 2026', page: 1}],\n    language: retrieval.language || validation.language_hint || \"en\",\n    project: finalProject,\n    latency_ms: latency_ms,\n    timestamp: new Date().toISOString(),\n    usage: { prompt_tokens: promptTokens, completion_tokens: completionTokens, total_tokens: totalTokens }\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2080,
+        496
+      ],
+      "id": "78f44c5c-7a7c-4742-8cf1-77bdc7cce6cc",
+      "name": "Format API Response"
+    },
+    {
+      "parameters": {
+        "content": "# Enterprise RAG API\n\n## Day 6 - Enterprise RAG API + Observability\n\n### Stack\n\n• Gemini Embedding 2\n• Gemini 2.5 Flash\n• Supabase pgvector\n• Semantic Search\n• Grounded Answers",
+        "height": 336,
+        "width": 208,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "6c5ba446-b674-4d6a-a756-b3050b18326f",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Validate Query Embedding - FIXED for $input chaining\nconst input = $input.first().json;\n// Embedding could be in different fields depending on node\nconst embedding = input.embedding || input.data?.[0]?.embedding || input.values || [];\n\nreturn [{\n  json: {\n    question: input.question || $('Detect Question Language').first?.json?.question || '',\n    query_embedding: embedding,\n    language: input.language,\n    detected_via: input.detected_via,\n    correlation_id: input.correlation_id,\n    start_time: input.start_time,\n    user_id: input.user_id,\n    session_id: input.session_id,\n    channel: input.channel,\n    filter: {\n      ... (input.filter || {}),\n      language: input.language // Auto-inject detected language for match_documents\n    }\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        960,
+        496
+      ],
+      "id": "90fee807-0abf-4e3f-b9be-e7a1ebb32914",
+      "name": "Validate Query Embedding"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Build Retrieval Context - FIXED for Day 6 Modules 2,3,6,9\nconst items = $input.all();\n// Deduplicate by content hash (Retrieve returns same chunk 3x due to filter {})\nconst seen = new Set();\nconst docs = items.map(i => i.json).filter(j => {\n  if (!j.content) return false;\n  const key = j.content.slice(0,100);\n  if (seen.has(key)) return false;\n  seen.add(key);\n  return true;\n});\n\nif (docs.length === 0) throw new Error('No docs from Retrieve - check Retrieve node');\n\n// Get upstream nodes\nconst langNode = $('Detect Question Language').first()?.json || {};\nconst validationNode = $('01-Validation+CorrelationID').first()?.json || {};\nconst projectNode = $('Detect Project - AR/EN Bayview/Damac').first()?.json || {};\n\n// Build context string for Gemini (grounded)\nconst context = docs.map(d => \n  `[Source: ${d.source || d.metadata?.source || 'Dubai DLD Fees 2026'} | Page: ${d.page || 1}]: ${d.content}`\n).join('\\n\\n');\n\n// Build sources array with citations\nconst sources = docs.map(d => ({\n  source: d.source || d.metadata?.source || 'Dubai DLD Fees 2026',\n  page: d.page || d.metadata?.page || 1,\n  project: d.project || d.metadata?.project || 'Dubai DLD Fees 2026',\n  similarity: d.similarity || d.score || 0\n}));\n\n// Get question and language properly\nconst finalQuestion = langNode.question || projectNode.question || validationNode.question || 'What is DLD transfer fee?';\nconst finalLanguage = langNode.language || 'en'; // FIX: was missing, caused 'auto'\nconst finalProject = projectNode.project || projectNode.requested_project || validationNode.project || 'Dubai DLD Fees 2026';\n\nreturn [{ json: {\n  retrieval_context: context, // For Gemini\n  question: finalQuestion,\n  language: finalLanguage, // FIX: Now passes 'en' not 'auto'\n  project: finalProject,\n  requested_project: finalProject,\n  sources: sources, // FIX: Now returns objects with page/project\n  correlation_id: langNode.correlation_id || validationNode.correlation_id,\n  start_time: langNode.start_time || validationNode.start_time, // For latency calc\n  filter: validationNode.original_body?.filter || {}\n}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1632,
+        496
+      ],
+      "id": "35afcd36-547e-4bb9-9898-59fc8010c151",
+      "name": "Build Retrieval Context"
+    },
+    {
+      "parameters": {
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        2304,
+        400
+      ],
+      "id": "de2347f8-3586-4074-a019-78c7eea1eccb",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Module 1: Fail-fast validation - skip language detection if validation failed\n\nif ($input.first().json._isValidationError) {\n  return [$input.first()];\n}\n\n// Detect Question Language v2 - FIXED - use $input, no node name ref\nconst input = $input.first().json;\nconst q = input.question || '';\n\nlet lang = 'en';\nlet via = 'default_en';\n\nif (/[\\u0600-\\u06FF]/.test(q)) {\n  if (/ہے|کیا|کہاں|کتنے|قیمت/.test(q)) {\n    lang = 'ur';\n    via = 'urdu_keyword';\n  } else {\n    lang = 'ar';\n    via = 'arabic_regex';\n  }\n} else if (/[\\u0900-\\u097F]/.test(q)) {\n  lang = 'hi';\n  via = 'hindi_regex';\n}\n\nreturn [{ \njson: { \n  question: q, language: lang, detected_via: via, correlation_id: input.correlation_id, start_time: input.start_time, filter: input.filter } \n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        512,
+        496
+      ],
+      "id": "540ea7d8-f242-4809-bfc8-3b15b084063f",
+      "name": "Detect Question Language"
+    },
+    {
+      "parameters": {
+        "tableId": "rag_logs_realestate",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "question",
+              "fieldValue": "={{ $json.question }}"
+            },
+            {
+              "fieldId": "language",
+              "fieldValue": "={{ $json.language }}"
+            },
+            {
+              "fieldId": "project",
+              "fieldValue": "={{ $json.project }}"
+            },
+            {
+              "fieldId": "answer",
+              "fieldValue": "={{ $json.answer }}"
+            },
+            {
+              "fieldId": "answered",
+              "fieldValue": "={{ $json.answer !== \"I could not find this information in the uploaded documents.\" }}"
+            },
+            {
+              "fieldId": "top_similarity",
+              "fieldValue": "={{ $json.sources?.[0]?.similarity ?? null }}"
+            },
+            {
+              "fieldId": "source_count",
+              "fieldValue": "={{ $json.sources?.length ?? 0 }}"
+            },
+            {
+              "fieldId": "sources",
+              "fieldValue": "={{ JSON.stringify($json.sources) }}"
+            },
+            {
+              "fieldId": "request_id",
+              "fieldValue": "={{$('Format API Response').first().json.request_id}}"
+            },
+            {
+              "fieldId": "latency_ms",
+              "fieldValue": "={{$('Format API Response').first().json.latency_ms}}"
+            },
+            {
+              "fieldId": "correlation_id",
+              "fieldValue": "={{$json.request_id}}"
+            },
+            {
+              "fieldId": "prompt_tokens",
+              "fieldValue": "={{$json.usage.prompt_tokens}}"
+            },
+            {
+              "fieldId": "token_usage",
+              "fieldValue": "={{JSON.stringify($json.usage)}}"
+            },
+            {
+              "fieldId": "total_tokens",
+              "fieldValue": "={{$json.usage.total_tokens}}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        2304,
+        592
+      ],
+      "id": "9cabb833-029b-410f-abd4-8eb4bcaf2ea4",
+      "name": "Insert Log (Supabase)",
+      "credentials": {
+        "supabaseApi": {
+          "id": "uwAmK3QR0J2Wd1go",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# Receives POST\n\n## Input\n\nquestion\n\n## Returns\n\nGrounded answer",
+        "height": 320,
+        "width": 208,
+        "color": "#FFFFFF"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        288,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "94e34e0e-b422-4470-b73c-f80b5ed9b8d7",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "content": "# Query Embedding\n\n## Gemini Embedding 2\n\nDetect Lang (ar/en) -> Embed -> Metadata Filter (project)",
+        "height": 320,
+        "width": 208,
+        "color": "#2F0D68"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        624,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "71d31b1d-a03d-42c1-a6e2-33ce27ace38b",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "# Semantic Search\n\n## Top-K similarity\n\n+ Rerank + Diversity Limit",
+        "height": 320,
+        "width": 208,
+        "color": "#032E15"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        976,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "2e64b036-40ed-4d65-bad4-8ecab433c26c",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## Grounded Generation\n\nGemini 2.5 Flash\n\nAnswers ONLY from context - AR/EN",
+        "height": 320,
+        "width": 208,
+        "color": "#032E15"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1328,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "5f865eac-1709-43c6-b0a9-2fe668d1b612",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "# API Response\n\n## Returns\n\n✓ answer\n✓ sources\n✓ language\n✓ project + similarity\n✓ timestamp",
+        "height": 320,
+        "width": 208,
+        "color": "#032E15"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1680,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "4d0f93fd-88fc-4efb-944e-cd94bdf3fae8",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Detect Project - Dynamic filter for all docs in image_523fe6.png\nconst q = ($input.first().json.question || '').toLowerCase();\nlet filter = [];\n\nif (q.includes('bayview')) filter.push({ source: 'Bayview Payment Plan' });\nif (q.includes('damac')) filter.push({ source: 'Damac Hills 2 - Payment Plan' });\nif (q.includes('community') || q.includes('e-scooter') || q.includes('off-road') || q.includes('scooter') || q.includes('club car')) {\n  filter.push({ source: 'Dubai Community Rules and Regulations' });\n}\nif (q.includes('dld') || q.includes('fees') || q.includes('transfer')) {\n  filter.push({ source: 'Dubai DLD Fees 2026' });\n}\n\n// If no specific source detected, search ALL docs (empty filter = diverse answers for portfolio)\nif (filter.length === 0) filter = [];\n\nreturn [{ json: { question: $input.first().json.question, filter, project: filter[0]?.source || 'general', language: $input.first().json.language || 'en' } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1184,
+        496
+      ],
+      "id": "8b532907-1995-4157-a5d0-798da1e2fbc1",
+      "name": "Detect Project - AR/EN Bayview/Damac"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Module 1: Request Validation + Correlation ID + Timer Start\nconst body = $input.first().json.body || $input.first().json || {};\nconst query = body.question || body.query || '';\nconst project = (body.project || '').toLowerCase();\nconst developer = (body.developer || '').toLowerCase();\n\n// 1. Correlation ID\nconst correlation_id = 'req_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,8);\nconst start_time = Date.now();\n\n// 2. Validation\nconst errors = [];\nif (!query || typeof query !== 'string' || query.trim() === '') {\n  errors.push('Missing or empty question');\n}\nif (query && query.length < 3) {\n  errors.push('Question too short (min 3 chars)');\n}\nif (query && query.length > 1000) {\n  errors.push('Question too long (max 1000 chars)');\n}\n\nconst allowedProjects = ['bayview', 'damac', 'dubai dld fees 2026', 'dld', 'general', ''];\nif (project && !allowedProjects.some(p => project.includes(p))) {\n  // Don't hard fail, just warn - allow general\n  // errors.push('Invalid project');\n}\n\nif (errors.length > 0) {\n  // Fail fast - return structured error that Format API Response can use\n  return [{\n    json: {\n      success: false,\n      correlation_id,\n      error: errors.join('; '),\n      retry: false,\n      status: 400,\n      start_time,\n      question: query,\n      project: project || 'general',\n      developer: developer || 'dubai',\n      _isValidationError: true\n    }\n  }];\n}\n\n// 3. Valid - pass forward\nreturn [{\n  json: {\n    success: true,\n    correlation_id,\n    start_time,\n    question: query.trim(),\n    project: project || 'dubai dld fees 2026', // default to your DLD doc\n    developer: developer || 'dubai land department',\n    language_hint: body.language || 'auto',\n    // keep original body for downstream\n    original_body: body\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        288,
+        496
+      ],
+      "id": "9f07f6bf-642d-4bf8-a1de-f16a50e799e3",
+      "name": "01-Validation+CorrelationID"
+    },
+    {
+      "parameters": {
+        "content": "# Module 6: Audit Logging - Supabase",
+        "height": 320,
+        "width": 208,
+        "color": "#032E15"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2016,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "a0dbf65e-f883-4295-b9bc-435bb38811f5",
+      "name": "Sticky Note5"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "01-Validation+CorrelationID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Query Embedding": {
+      "main": [
+        [
+          {
+            "node": "Validate Query Embedding",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retrieve Similar Chunks": {
+      "main": [
+        [
+          {
+            "node": "Build Retrieval Context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Grounded Answer": {
+      "main": [
+        [
+          {
+            "node": "Format API Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Query Embedding": {
+      "main": [
+        [
+          {
+            "node": "Detect Project - AR/EN Bayview/Damac",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Retrieval Context": {
+      "main": [
+        [
+          {
+            "node": "Generate Grounded Answer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format API Response": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Insert Log (Supabase)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Detect Question Language": {
+      "main": [
+        [
+          {
+            "node": "Generate Query Embedding",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Detect Project - AR/EN Bayview/Damac": {
+      "main": [
+        [
+          {
+            "node": "Retrieve Similar Chunks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "01-Validation+CorrelationID": {
+      "main": [
+        [
+          {
+            "node": "Detect Question Language",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "3582d611-f9cd-444d-ba1e-633a4625dc8c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ccc0d1d85837bf39ed140153bd936119defbd32e54c3465b7c78d8b4010240fd"
+  },
+  "nodeGroups": [],
+  "id": "5qHknMnVsBHGDx6J",
+  "tags": [
+    {
+      "updatedAt": "2026-09-23T06:59:13.749Z",
+      "createdAt": "2026-09-23T06:59:13.749Z",
+      "id": "pQz61iM59tSVceL5",
+      "name": "Day 6"
+    }
+  ]
+}

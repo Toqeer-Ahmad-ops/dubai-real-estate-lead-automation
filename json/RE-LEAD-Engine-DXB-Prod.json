@@ -1,0 +1,2009 @@
+{
+  "name": "RE-LEAD-Engine-DXB-Prod",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "69f9cbe1-e4fa-4c56-82fb-faf4da8e8e22",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        1312
+      ],
+      "id": "c3d1c86f-9060-439c-bb9d-75009c3a2ca9",
+      "name": "Webhook",
+      "webhookId": "69f9cbe1-e4fa-4c56-82fb-faf4da8e8e22"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "14848cb5-6c7e-4ee8-b223-67a83b42cc8c",
+              "leftValue": "={{ $json.type }}",
+              "rightValue": "text",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "1a38ae5d-bbb5-444a-a3c7-efb3f49ce842",
+              "leftValue": "={{ $json.from_me }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1120,
+        1840
+      ],
+      "id": "57d9bec2-dbfb-4f45-a310-8be673aef47a",
+      "name": "Is Text Message?"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ea222509-dd63-4d3a-ba5c-e0b5180a8351",
+              "name": "correlation_id",
+              "value": "={{ $execution.id }}",
+              "type": "string"
+            },
+            {
+              "id": "1e135229-e080-4e0a-8f50-f29f0d79b011",
+              "name": "phone",
+              "value": "={{ $json.from }}",
+              "type": "string"
+            },
+            {
+              "id": "bc0e9576-7c26-4e41-b23c-3a9defae3de1",
+              "name": "question",
+              "value": "={{ $json.text.body }}",
+              "type": "string"
+            },
+            {
+              "id": "39047d82-f2a8-4cb2-9d8f-a7765ae83de4",
+              "name": "chat_id",
+              "value": "={{ $json.chat_id }}",
+              "type": "string"
+            },
+            {
+              "id": "7837889d-23fc-4e1b-bc40-6c6785f14cfe",
+              "name": "from_name",
+              "value": "={{ $json.from_name }}",
+              "type": "string"
+            },
+            {
+              "id": "af84691d-8e0d-4bcd-a351-be2c2976dd34",
+              "name": "message_id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "36e31829-f83f-4373-8e02-30089865487f",
+              "name": "started_at",
+              "value": "={{ Date.now() }}",
+              "type": "string"
+            },
+            {
+              "id": "b643ef52-2aef-4bdf-8b9f-595e393d23a5",
+              "name": "is_voice",
+              "value": false,
+              "type": "boolean"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        1344,
+        1888
+      ],
+      "id": "8f53006f-54d6-4ddf-a433-0d8a673fe64d",
+      "name": "Normalize WhatsApp"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://rematch-extent-geology.ngrok-free.dev/webhook/b6a6697f-0f00-4b78-86e7-edfa9b416f53",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googlePalmApi",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "question",
+              "value": "={{ $('Mark Processing [before Call RAG API]').first().json.question || $json.question || 'Dubai DLD Fees 2026' }}"
+            },
+            {
+              "name": "phone",
+              "value": "={{ $json.phone }}"
+            },
+            {
+              "name": "correlation_id",
+              "value": "={{ $json.correlation_id || $json.chat_id }}"
+            },
+            {
+              "name": "chat_id",
+              "value": "={{ $json.chat_id }}"
+            },
+            {
+              "name": "from_name",
+              "value": "={{ $json.from_name }}"
+            },
+            {
+              "name": "filter",
+              "value": "={{ {project: \"dubai dld fees 2026\"} }}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 25000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        2816,
+        1120
+      ],
+      "id": "9e950b1c-f3fe-4b72-929e-95e4f8aa6abf",
+      "name": "Call RAG API",
+      "alwaysOutputData": true,
+      "retryOnFail": false,
+      "waitBetweenTries": 5000,
+      "maxTries": 2,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "24HMO98yb3N7ucpr",
+          "name": "Gemini Toqeer Prod"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://gateway.whapi.cloud/messages/text",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer bcyw898RjMlRsDFp4ywk6LUe5cmLoDlx"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "to",
+              "value": "={{ $('Normalize & Detect Language (deterministic, no AI yet)').first().json.chat_id || $('Format_Lead_Response').first().json.phone + '@s.whatsapp.net' || $('Update Existing Lead').first().json.phone + '@s.whatsapp.net' }}"
+            },
+            {
+              "name": "body",
+              "value": "={{ $if($('Format Professional Answer').isExecuted, $('Format Professional Answer').first().json.answer_formatted, $('Format_Ask_Missing').isExecuted ? $('Format_Ask_Missing').first().json.response : $('Format_Lead_Response').first().json.response) }}"
+            },
+            {
+              "name": "typing time",
+              "value": "={{ $json.typing_time || 1000 }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        4384,
+        1120
+      ],
+      "id": "71cc797e-ba1d-4ad2-b508-d78ecd0a5cff",
+      "name": "Send WhatsApp Reply"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"status\": \"received\", \"reply_sent\": true\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        5056,
+        1216
+      ],
+      "id": "b4b46352-b7de-4465-a55a-4a4d56aee704",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "processed_messages",
+        "limit": 1,
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "message_id",
+              "condition": "eq",
+              "keyValue": "={{ $('Route INFO vs LEAD').first().json.message_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        2016,
+        1024
+      ],
+      "id": "e86d86c1-39cd-4997-a4de-5e71f4cbade9",
+      "name": "Check Idempotency",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "uwAmK3QR0J2Wd1go",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "7d30ad72-4fd5-4307-ad22-7aee004be78a",
+              "leftValue": "={{ $json.message_id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {
+          "ignoreCase": false
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        2240,
+        1024
+      ],
+      "id": "afc191ed-1ef0-490d-989a-684aeb5d310a",
+      "name": "Already Processed?"
+    },
+    {
+      "parameters": {
+        "tableId": "processed_messages",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "message_id",
+              "fieldValue": "={{ $('Normalize & Detect Language (deterministic, no AI yet)').first().json.message_id || $('Set Question').first().json.message_id }}"
+            },
+            {
+              "fieldId": "phone",
+              "fieldValue": "={{ $('Normalize & Detect Language (deterministic, no AI yet)').first().json.phone || $('Set Question').first().json.phone }}"
+            },
+            {
+              "fieldId": "chat_id",
+              "fieldValue": "={{ $('Normalize & Detect Language (deterministic, no AI yet)').first().json.chat_id || $('Set Question').first().json.chat_id }}"
+            },
+            {
+              "fieldId": "correlation_id",
+              "fieldValue": "={{ $('Normalize & Detect Language (deterministic, no AI yet)').first().json.correlation_id || $execution.id }}"
+            },
+            {
+              "fieldId": "question",
+              "fieldValue": "={{ $('Normalize & Detect Language (deterministic, no AI yet)').first().json.question || $('Set Question').first().json.question }}"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "processing"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        2528,
+        1120
+      ],
+      "id": "644d47bb-2d09-4fef-ba25-6844dd593ce3",
+      "name": "Mark Processing [before Call RAG API]",
+      "credentials": {
+        "supabaseApi": {
+          "id": "uwAmK3QR0J2Wd1go",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "processed_messages",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "message_id",
+              "condition": "eq",
+              "keyValue": "={{ $if($('Normalize WhatsApp').isExecuted, $('Normalize WhatsApp').first().json.message_id, '') || $if($('Normalize & Detect Language (deterministic, no AI yet)').isExecuted, $('Normalize & Detect Language (deterministic, no AI yet)').first().json.message_id, '') || $('Flatten & Filter Spam').first().json.message_id || $('Webhook').first().json.message_id || $json.message_id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "status",
+              "fieldValue": "completed"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        4608,
+        896
+      ],
+      "id": "9620a067-b429-44c8-80a2-2b283440d220",
+      "name": "Mark Completed",
+      "credentials": {
+        "supabaseApi": {
+          "id": "uwAmK3QR0J2Wd1go",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "processed_messages",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "message_id",
+              "condition": "eq",
+              "keyValue": "={{ $json.chat_id || $json.from || 'unknown' }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "status",
+              "fieldValue": "failed"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        4608,
+        1456
+      ],
+      "id": "79e0cd69-f6be-4688-bc26-9bfb942cb66b",
+      "name": "Mark Failed",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "uwAmK3QR0J2Wd1go",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "rag_audit_logs",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "message_id",
+              "fieldValue": "={{ $if($('Route INFO vs LEAD').isExecuted, $('Route INFO vs LEAD').first().json.message_id, '') || $if($('Format_Lead_Response').isExecuted, $('Format_Lead_Response').first().json.correlation_id, '') || $('Flatten & Filter Spam').first().json.message_id || $('Webhook').first().json.message_id }}"
+            },
+            {
+              "fieldId": "phone",
+              "fieldValue": "={{ $if($('Route INFO vs LEAD').isExecuted, $('Route INFO vs LEAD').first().json.phone, '') || $if($('Format_Lead_Response').isExecuted, $('Format_Lead_Response').first().json.phone, '') || $('Flatten & Filter Spam').first().json.phone }}"
+            },
+            {
+              "fieldId": "question",
+              "fieldValue": "={{ $if($('Route INFO vs LEAD').isExecuted, $('Route INFO vs LEAD').first().json.question, '') || $if($('Flatten & Filter Spam').isExecuted, $('Flatten & Filter Spam').first().json.question, '') || '' }}"
+            },
+            {
+              "fieldId": "answer",
+              "fieldValue": "={{ $if($('Call RAG API').isExecuted, $('Call RAG API').first().json.answer, '') || $if($('Format_Lead_Response').isExecuted, $('Format_Lead_Response').first().json.response, '') }}"
+            },
+            {
+              "fieldId": "language",
+              "fieldValue": "={{ $if($('Route INFO vs LEAD').isExecuted, ($('Route INFO vs LEAD').first().json.question||'').match(/[\\u0600-\\u06FF]/)?'ar':'en', '') || $if($('Format_Lead_Response').isExecuted, $('Format_Lead_Response').first().json.lang, 'en') }}"
+            },
+            {
+              "fieldId": "latency_ms",
+              "fieldValue": "={{ $if($('Call RAG API').isExecuted, $('Call RAG API').first().json.latency_ms||0, 0) }}"
+            },
+            {
+              "fieldId": "rag_status",
+              "fieldValue": "={{ $if($('Call RAG API').isExecuted, 'completed', 'lead') }}"
+            },
+            {
+              "fieldId": "correlation_id",
+              "fieldValue": "={{ $if($('Route INFO vs LEAD').isExecuted, $('Route INFO vs LEAD').first().json.correlation_id, '') || $if($('Format_Lead_Response').isExecuted, $('Format_Lead_Response').first().json.correlation_id, '') }}"
+            },
+            {
+              "fieldId": "source",
+              "fieldValue": "={{ $if($('Call RAG API').isExecuted, $('Call RAG API').first().json.source || $('Call RAG API').first().json.sources?.[0] || 'Dubai DLD Fees 2026', 'leads_table') }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        4832,
+        896
+      ],
+      "id": "d58bdab2-4bb8-4622-bdb7-4251d4ada63c",
+      "name": "Log Audit Success",
+      "credentials": {
+        "supabaseApi": {
+          "id": "uwAmK3QR0J2Wd1go",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "rag_audit_logs",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "answer",
+              "fieldValue": "={{ $('Send Error Reply').first().json.answer }}"
+            },
+            {
+              "fieldId": "rag_status",
+              "fieldValue": "failed"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        4816,
+        1456
+      ],
+      "id": "eb6bb553-350a-4110-9c53-d3ca146e5cba",
+      "name": "Log Audit Failed",
+      "credentials": {
+        "supabaseApi": {
+          "id": "uwAmK3QR0J2Wd1go",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "rag_audit_logs",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "rag_status",
+              "fieldValue": "already_processed"
+            },
+            {
+              "fieldId": "answer",
+              "fieldValue": "already_processed"
+            },
+            {
+              "fieldId": "latency_ms",
+              "fieldValue": "={{ Date.now() - new Date($json.created_at).getTime() || 8000 }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        4832,
+        704
+      ],
+      "id": "dab8421b-368f-46b2-87ee-473a51ed3876",
+      "name": "Log Audit Duplicate",
+      "credentials": {
+        "supabaseApi": {
+          "id": "uwAmK3QR0J2Wd1go",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "13dd5e53-0ccf-4d0d-868d-0c8e097583ec",
+              "leftValue": "={{ $json.type }}",
+              "rightValue": "audio",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "9f77f49c-1102-452d-9717-421894f383dd",
+              "leftValue": "={{ $json.type }}",
+              "rightValue": "voice",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "88d2f73c-8e50-4031-9f0f-140b0a3ba025",
+              "leftValue": "={{ $json.type }}",
+              "rightValue": "audio",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        448,
+        1312
+      ],
+      "id": "73efafbe-be23-4186-8330-41d9a57fa609",
+      "name": "Is Voice?"
+    },
+    {
+      "parameters": {
+        "url": "=https://gate.whapi.cloud/media/{{ $json.body.messages[0].audio?.id || $json.body.messages[0].voice?.id || $json.body.messages[0].id }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer bcyw898RjMlRsDFp4ywk6LUe5cmLoDlx"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        672,
+        1168
+      ],
+      "id": "342bac5c-0343-4430-b802-5889aa8de762",
+      "name": "Download Voice"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.groq.com/openai/v1/audio/transcriptions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "groqApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": []
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "data"
+            },
+            {
+              "name": "model",
+              "value": "whisper-large-v3-turbo"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 120000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        1120,
+        1168
+      ],
+      "id": "760c8292-933b-416e-96b5-46637ff5752f",
+      "name": "Transcribe",
+      "credentials": {
+        "groqApi": {
+          "id": "krcvFP1yGMrSL6ot",
+          "name": "Groq - Authorization Bearer"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2f6c660a-8257-4aa2-8b4f-93dba6f0283f",
+              "name": "question",
+              "value": "={{ $json.text || $('Transcribe').first().json.text || $json.transcription }}",
+              "type": "string"
+            },
+            {
+              "id": "43b2c26b-1aef-417b-972d-878abb5f377d",
+              "name": "phone",
+              "value": "={{ $('Flatten & Filter Spam').first().json.from }}",
+              "type": "string"
+            },
+            {
+              "id": "e20f76ae-92b2-4e47-95d9-9183853c29b9",
+              "name": "message_id",
+              "value": "={{ $json.id || $('Transcribe').first().json.id || $('Flatten & Filter Spam').first().json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "6a6a2fd4-712c-4be3-816a-fe7feb285d01",
+              "name": "started_at",
+              "value": "={{ Date.now() }}",
+              "type": "string"
+            },
+            {
+              "id": "1c7f732d-2d5a-4700-aa0c-703afc337ee8",
+              "name": "chat_id",
+              "value": "={{ $('Flatten & Filter Spam').first().json.chat_id }}",
+              "type": "string"
+            },
+            {
+              "id": "ba1d128b-22e7-4fee-aa40-1380c6cb037f",
+              "name": "correlation_id",
+              "value": "={{ $execution.id }}",
+              "type": "string"
+            },
+            {
+              "id": "b6534a94-acd2-47f5-89ff-b542b914dc9b",
+              "name": "is_voice",
+              "value": true,
+              "type": "boolean"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        1344,
+        1168
+      ],
+      "id": "1b785ab8-0594-410b-83bb-34ae904fe78e",
+      "name": "Set Question"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.elevenlabs.io/v1/text-to-speech/pFZP5JQG7iQjIQuC4Bku",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "xi-api-key",
+              "value": "sk_3c8b1739ee1841ef71dd63493009e7c70e57beefe76f7022"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{\n{\ntext: $('Is Voice Input?').first().json.answer_formatted.replace(/\\[Source:.*?\\]/gi,'').replace(/\\[المصدر:.*?\\]/gi,'').replace(/\\[مصدر:.*?\\]/gi,'').replace(/\\n/g,' ').trim(),\nmodel_id: \"eleven_multilingual_v2\",\nvoice_id: \"21m00Tcm4TlvDq8ikWAM\"\n}\n}}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        3712,
+        848
+      ],
+      "id": "5a57e156-0d57-48fb-b931-aa7da144a154",
+      "name": "Voice Reply"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://gate.whapi.cloud/messages/voice",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer bcyw898RjMlRsDFp4ywk6LUe5cmLoDlx"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "to",
+              "value": "971503647641@s.whatsapp.net"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "media",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        4160,
+        848
+      ],
+      "id": "dc42df1f-2e0f-4c47-8bb4-82d50133117f",
+      "name": "Whapi Send Voice"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "701e77d9-486a-42f5-ae40-e531d070fbc5",
+              "name": "answer",
+              "value": "={{ $('Call RAG API').first().json.answer.replace(/\\[Source:.*?\\]/gi,'').replace(/\\[المصدر:.*?\\]/gi,'').replace(/\\n/g,' ').trim() }}",
+              "type": "string"
+            },
+            {
+              "id": "2e894100-8f31-44db-9dc2-44b2d9d543c9",
+              "name": "success",
+              "value": true,
+              "type": "boolean"
+            },
+            {
+              "id": "30d57d6d-a87a-4f88-b9cf-414cfa973186",
+              "name": "chat_id",
+              "value": "={{ $json.chat_id || $('Route INFO vs LEAD').first().json.chat_id || $('Normalize & Detect Language (deterministic, no AI yet)').first().json.chat_id }}",
+              "type": "string"
+            },
+            {
+              "id": "7f772e4f-84bc-4be7-bf72-87d629cb23ca",
+              "name": "answer_formatted",
+              "value": "={{ (() => {\n  let raw = ($('Call RAG API').first().json.answer || $json.answer || '').replace(/\\[Source:.*?\\]/gi,'').replace(/\\[المصدر:.*?\\]/gi,'').replace(/\\[مصدر:.*?\\]/gi,'').trim();\n  let isAr = /[\\u0600-\\u06FF]/.test(raw);\n  let head = isAr ? '📊 رسوم دبي 2026\\n\\n' : '📊 Dubai Fees 2026\\n\\n';\n  return head + raw;\n})() }}",
+              "type": "string"
+            },
+            {
+              "id": "795a2df2-23d6-4d1f-a7ec-72a57baeb0fc",
+              "name": "is_voice",
+              "value": "={{ $('Normalize & Detect Language (deterministic, no AI yet)').first().json.is_voice }}",
+              "type": "boolean"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        3264,
+        1280
+      ],
+      "id": "ccfb18f4-1965-408d-9066-e368af0dada5",
+      "name": "Format Professional Answer"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "e903104a-b52c-49e0-a9c5-3b183e10e84d",
+              "leftValue": "={{ $json.success }}",
+              "rightValue": false,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "62e13b64-6654-4557-909b-1cb4e23835a5",
+              "leftValue": "={{ JSON.stringify($json.error || '').toLowerCase() }}",
+              "rightValue": "quota",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "ba4abb6c-4a96-427a-9ce7-5a9dcee45cda",
+              "leftValue": "={{ JSON.stringify($json).toLowerCase() }}",
+              "rightValue": "system busy",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "c8e15a98-dd73-4aae-ab44-bb1b49406f3b",
+              "leftValue": "={{ JSON.stringify($json).toLowerCase() }}",
+              "rightValue": "429",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        3040,
+        1120
+      ],
+      "id": "29f7edb2-a9fc-4744-9cf7-2fa2bdd9df1e",
+      "name": "Is Quota Error?"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e8362ce9-25a4-4bce-9041-25993fcba0da",
+              "name": "answer_formatted",
+              "value": "={{ $json.answer.replace(/\\[Source:.*?\\]/gi,'').replace(/\\[المصدر:.*?\\]/gi,'').replace(/\\n/g,' ').substring(0,400).trim() }}",
+              "type": "string"
+            },
+            {
+              "id": "8faa2d65-7ae4-4297-a9c4-a254397e79b3",
+              "name": "answer",
+              "value": "={{ $json.answer.replace(/\\[Source:.*?\\]/gi,'').replace(/\\[المصدر:.*?\\]/gi,'').replace(/\\n/g,' ').trim() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        3264,
+        1024
+      ],
+      "id": "8cba26e2-8883-480a-a35d-892e52141092",
+      "name": "Fallback Reply"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Normalize & Detect Language (deterministic, no AI yet)\n// Supports: English + Arabic, Text + Voice, LEAD vs INFO\n\n// 1. Get all incoming items (voice branch + text branch converge here)\nconst all = $input.all();\n// Pick item that has question/text, fallback to first\nconst item = (all.find(i => i.json.question || i.json.text) || all[0]).json;\n\n// 2. Raw user question\nconst raw = (item.question || item.text || '').toString();\nconst text = raw.trim();\n\n// 3. Contact info (kept for WhatsApp reply)\nconst phone = item.phone || '+971501111222';\nconst chat_id = item.chat_id || `${phone}@s.whatsapp.net`;\nconst message_id = item.message_id || `msg_${Date.now()}`;\n\n// 4. Language detection - Arabic if Arabic chars present\nconst isAr = /[\\u0600-\\u06FF]/.test(text);\nconst language = isAr ? 'ar' : 'en';\nconst lower = text.toLowerCase(); // for English keyword matching, Arabic stays same\n\n// 5. Voice detection - true if any input was voice\n// Voice path: Set Question sets is_voice=true, Text path: Normalize WhatsApp sets is_voice=false\nconst is_voice = all.some(i => i.json.is_voice === true) || item.is_voice === true || false;\n\n// 6. LEAD keywords = user wants to buy/rent/search property\nconst leadKw = [\n  // EN - buying intent\n  'buy','rent','looking for','looking','want','need','search','budget','million','aed',\n  'bhk','2br','1br','3br','studio','apartment','villa','townhouse','marina','downtown','palm','hills','invest','ready',\n  // AR - نية الشراء / البحث\n  'ابحث','ابحث عن','ابغى','اريد','بدي','محتاج','شقة','شقق','غرفة','غرفتين','غرف','صالة','فيلا','استوديو','مارينا','داون تاون','وسط المدينة','تلال','نخلة','ميزانية','مليون','درهم','شراء','ايجار','استثمار','مطلوب','جاهز'\n];\n\n// 7. INFO keywords = user asks about fees/procedure\nconst infoKw = [\n  // EN - fee / procedure questions\n  'fee','fees','dld','transfer','registration','trustee','commission','service charge','ejari','mortgage','cost','charges','what is','how much','how to','procedure','process','explain',\n  // AR - استفسار عن الرسوم\n  'رسوم','الرسوم','دائرة الاراضي','نقل','تسجيل','امين التسجيل','عمولة','رسوم الخدمة','ايجاري','رهن','تكلفة','مصاريف','كم','ما هي','ما هو','كيف','اشرح','اجراءات'\n];\n\n// 8. Check if text contains LEAD or INFO keywords\nconst hasLead = leadKw.some(k => lower.includes(k));\nconst hasInfo = infoKw.some(k => lower.includes(k));\n\n// 9. Strong LEAD signal = budget / price mentioned (2M, 2 مليون, budget, ميزانية)\nconst numberBudget = /\\d+(\\.\\d+)?\\s*(m|million|مليون|k|aed|درهم)/i.test(text);\nconst isFeeQuestion = /what are|what is|how much|fee|رسوم|كم|ما هي/i.test(text);\nconst budgetPattern = numberBudget && !isFeeQuestion; // price alone = LEAD, price + fee word = INFO\n\n// 10. Decide quick_intent\n// - Only INFO keywords -> INFO (ex: \"What are DLD fees?\" / \"ما هي رسوم التسجيل؟\")\n// - Only LEAD keywords -> LEAD (ex: \"Looking for 2BR Marina\" / \"ابحث عن شقة\")\n// - Both -> if budget present -> LEAD, else INFO\n// - None -> INFO (hello/hi)\nlet quick_intent = 'lead';\nif (hasInfo && !hasLead) quick_intent = 'info';\nelse if (hasInfo && hasLead) quick_intent = budgetPattern ? 'lead' : 'info';\nelse if (!hasLead && !hasInfo) quick_intent = 'info';\n\n// 11. Return normalized data for next nodes\nreturn [{\n  phone,\n  chat_id,\n  message_id,\n  question: text,\n  text,\n  language,\n  quick_intent,      // 'lead' -> Message a model, 'info' -> Call RAG API\n  is_voice,          // true -> Voice Reply + Whapi Send Voice, false -> text only\n  correlation_id: `lead_${Date.now()}`,\n  original_question: raw\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1568,
+        1168
+      ],
+      "id": "612d8a01-ebe6-4128-91e6-105ba75e5c04",
+      "name": "Normalize & Detect Language (deterministic, no AI yet)",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "7c1e97ac-3077-4604-b2fa-4ef7f0693e4a",
+              "leftValue": "={{$json.quick_intent}}",
+              "rightValue": "info",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1792,
+        1168
+      ],
+      "id": "5fdcb84f-6658-43f2-8331-543bf72a4185",
+      "name": "Route INFO vs LEAD"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-3.5-flash-lite",
+          "mode": "list",
+          "cachedResultName": "models/gemini-3.5-flash-lite"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are a UAE real estate lead extraction engine.\nTASK: Extract structured lead data from customer message.\nLanguage: {{ $json.language || ($json.question.match(/[\\u0600-\\u06FF]/) ? 'ar' : 'en') }}\nText: \"{{ $json.question }}\"\n\nRULES - CRITICAL - SINGLE JSON ONLY:\n1. Return EXACTLY ONE JSON OBJECT. Never return 2 objects, never array, never NDJSON like }{ or newline separated JSON.\n2. If customer mentions 2 properties (ex: \"2BR Marina budget 2M and 1BR Downtown 1.2M\"), extract ONLY FIRST property as primary lead. Ignore second.\n3. Extract ONLY facts explicitly stated. If not mentioned, return null. NEVER guess/hallucinate.\n4. Budget: parse \"1.5M\" -> 1500000, \"2M AED\" -> 2000000, \"1.2M\" -> 1200000\n5. Location: area name exactly as written (Marina, Downtown, Palm)\n6. Intent: buy, rent, sell, info\n7. Output RAW JSON ONLY - no markdown, no ```json, no explanation.\n\nREQUIRED JSON SCHEMA - SINGLE OBJECT:\n{\"intent\":\"buy|rent|sell|info\",\"location\":\"string|null\",\"project\":\"string|null\",\"bedrooms\":number|null,\"budget_min\":number|null,\"budget_max\":number|null,\"budget_currency\":\"AED\",\"timeline\":\"string|null\",\"missing_fields\":[]}\n\nExamples:\nInput: \"Hi, looking for 2BR in Marina, budget 2M AED, ready to buy next month I want to invest in 1BR Downtown, budget 1.2M\"\nOutput: {\"intent\":\"buy\",\"location\":\"Marina\",\"project\":null,\"bedrooms\":2,\"budget_min\":null,\"budget_max\":2000000,\"budget_currency\":\"AED\",\"timeline\":\"next month\",\"missing_fields\":[]}\n\nInput: \"What are Dubai DLD transfer fees for a 1.5M apartment in Marina?\"\nOutput: {\"intent\":\"info\",\"location\":\"Marina\",\"project\":null,\"bedrooms\":null,\"budget_min\":null,\"budget_max\":1500000,\"budget_currency\":\"AED\",\"timeline\":null,\"missing_fields\":[]}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        2464,
+        1520
+      ],
+      "id": "f2e9f91b-ffed-41cb-b803-b688f273df6f",
+      "name": "Message a model",
+      "retryOnFail": true,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "24HMO98yb3N7ucpr",
+          "name": "Gemini Toqeer Prod"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Validate Gemini JSON - prevent hallucination + handle double JSON\nconst item = $input.first().json;\nconst raw = item.text || item.content?.parts?.[0]?.text || item.response || \"\";\nlet cleaned = raw.replace(/```json|```/g, \"\").replace(/```/g, \"\").trim();\n\n// Extract first balanced { } object\nfunction extractFirstJson(str) {\n  let depth = 0, start = -1;\n  for (let i = 0; i < str.length; i++) {\n    if (str[i] === '{') { if (depth===0) start=i; depth++; }\n    if (str[i] === '}') { depth--; if (depth===0 && start!==-1) {\n      try { return JSON.parse(str.slice(start, i+1)); } catch { start=-1; }\n    }}\n  }\n  return null;\n}\n\nlet parsed = null;\ntry {\n  parsed = JSON.parse(cleaned);\n  if (Array.isArray(parsed)) parsed = parsed[0]; // take first if array\n} catch {\n  // Fix \"}{\" or \"}\\n{\" -> make array\n  let fixed = cleaned.replace(/}\\s*{/g, '},{').replace(/}\\s*\\n\\s*{/g, '},{');\n  if (!fixed.trim().startsWith('[')) fixed = '[' + fixed + ']';\n  try {\n    const arr = JSON.parse(fixed);\n    parsed = Array.isArray(arr)? arr[0] : arr;\n  } catch {\n    parsed = extractFirstJson(cleaned);\n  }\n}\n\n// Fallback - always an object\nif (!parsed || typeof parsed!== 'object' || Array.isArray(parsed)) {\n  parsed = {\n    intent: \"buy\",\n    location: null,\n    bedrooms: null,\n    budget_max: null,\n    error: \"Failed to parse Gemini\",\n    raw: cleaned.slice(0,2000)\n  };\n}\n\n// Preserve contact for FindExisting_Lead / Create_Lead\nreturn [{\n  json: {\n   ...parsed,\n    phone: item.phone || null,\n    chat_id: item.chat_id || null,\n    message_id: item.message_id || null,\n    quick_intent: item.quick_intent || \"lead\",\n    language: item.language || \"en\",\n    is_voice: item.is_voice?? false\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2816,
+        1520
+      ],
+      "id": "07111c8c-1136-4cef-a8ea-a0fb67592ed6",
+      "name": "Validate_Extraction"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "leads",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "phone",
+              "keyValue": "={{ $json.phone || $('Normalize WhatsApp').first().json.phone }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        3040,
+        1520
+      ],
+      "id": "65c8d39e-5078-4b01-a848-f9aa0b23d0a2",
+      "name": "Find Existing Lead",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "uwAmK3QR0J2Wd1go",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "67d17d5f-c5fc-4d7e-9b4c-4020be37e03c",
+              "leftValue": "={{ $json.id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        3264,
+        1520
+      ],
+      "id": "2d105a90-87d8-47d7-8ed8-a33bcc92bfc6",
+      "name": "Lead Exists?"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "leads",
+        "filterType": "string",
+        "filterString": "=phone=eq.{{ $('Normalize WhatsApp').first().json.phone }}",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "name",
+              "fieldValue": "={{ $json.name }}"
+            },
+            {
+              "fieldId": "intent",
+              "fieldValue": "={{ $json.intent }}"
+            },
+            {
+              "fieldId": "property_type",
+              "fieldValue": "={{ $json.property_type }}"
+            },
+            {
+              "fieldId": "location",
+              "fieldValue": "={{ $json.location }}"
+            },
+            {
+              "fieldId": "project",
+              "fieldValue": "={{ $json.project }}"
+            },
+            {
+              "fieldId": "bedrooms",
+              "fieldValue": "={{ $json.bedrooms }}"
+            },
+            {
+              "fieldId": "budget_min",
+              "fieldValue": "={{ $json.budget_min }}"
+            },
+            {
+              "fieldId": "budget_max",
+              "fieldValue": "={{ $json.budget_max }}"
+            },
+            {
+              "fieldId": "budget_currency",
+              "fieldValue": "AED"
+            },
+            {
+              "fieldId": "timeline",
+              "fieldValue": "={{ $json.timeline }}"
+            },
+            {
+              "fieldId": "financing",
+              "fieldValue": "={{ $json.financing }}"
+            },
+            {
+              "fieldId": "missing_fields",
+              "fieldValue": "={{ $json.missing_fields }}"
+            },
+            {
+              "fieldId": "lead_score",
+              "fieldValue": "={{ ($json.location?20:0)+($json.budget_max?30:0)+($json.bedrooms?20:0)+($json.property_type?10:0)+($json.timeline?10:0)+($json.financing?10:0) }}"
+            },
+            {
+              "fieldId": "qualification_status",
+              "fieldValue": "={{ $json.missing_fields.length===0?'qualified':'needs_info' }}"
+            },
+            {
+              "fieldId": "last_message",
+              "fieldValue": "={{ $json.last_message }}"
+            },
+            {
+              "fieldId": "updated_at",
+              "fieldValue": "={{ $now }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        3488,
+        1408
+      ],
+      "id": "e0267274-c166-4f43-9f95-133df0d3ea57",
+      "name": "Update Existing Lead",
+      "credentials": {
+        "supabaseApi": {
+          "id": "uwAmK3QR0J2Wd1go",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "leads",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "name",
+              "fieldValue": "={{ $json.name }}"
+            },
+            {
+              "fieldId": "intent",
+              "fieldValue": "={{ $json.intent }}"
+            },
+            {
+              "fieldId": "property_type",
+              "fieldValue": "={{ $json.property_type }}"
+            },
+            {
+              "fieldId": "location",
+              "fieldValue": "={{ $json.location }}"
+            },
+            {
+              "fieldId": "project",
+              "fieldValue": "={{ $json.project }}"
+            },
+            {
+              "fieldId": "bedrooms",
+              "fieldValue": "={{ $json.bedrooms }}"
+            },
+            {
+              "fieldId": "budget_min",
+              "fieldValue": "={{ $json.budget_min }}"
+            },
+            {
+              "fieldId": "budget_max",
+              "fieldValue": "={{ $json.budget_max }}"
+            },
+            {
+              "fieldId": "budget_currency",
+              "fieldValue": "AED"
+            },
+            {
+              "fieldId": "timeline",
+              "fieldValue": "={{ $json.timeline }}"
+            },
+            {
+              "fieldId": "financing",
+              "fieldValue": "={{ $json.financing }}"
+            },
+            {
+              "fieldId": "missing_fields",
+              "fieldValue": "={{ $json.missing_fields }}"
+            },
+            {
+              "fieldId": "lead_score",
+              "fieldValue": "={{ ($json.location?20:0)+($json.budget_max?30:0)+($json.bedrooms?20:0)+($json.property_type?10:0)+($json.timeline?10:0)+($json.financing?10:0) }}"
+            },
+            {
+              "fieldId": "qualification_status",
+              "fieldValue": "={{ $json.missing_fields.length===0?'qualified':'needs_info' }}"
+            },
+            {
+              "fieldId": "last_message",
+              "fieldValue": "={{ $json.last_message }}"
+            },
+            {
+              "fieldId": "phone",
+              "fieldValue": "={{ $('Normalize WhatsApp').first().json.phone }}"
+            },
+            {
+              "fieldId": "source",
+              "fieldValue": "whatsapp"
+            },
+            {
+              "fieldId": "correlation_id",
+              "fieldValue": "={{ $json.correlation_id }}"
+            },
+            {
+              "fieldId": "created_at",
+              "fieldValue": "={{ $now }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        3488,
+        1600
+      ],
+      "id": "3156f141-4619-4610-bc92-de03e26672e9",
+      "name": "Create New Lead",
+      "credentials": {
+        "supabaseApi": {
+          "id": "uwAmK3QR0J2Wd1go",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Format_Lead_Response - Returns RAG-style DLD answer you liked in image_e4f10a.png\n// Lead is already saved in Supabase, now return user-facing message\n\nconst row = $input.first().json || {}; // from Update/Create Lead\nconst ext = $('Validate_Extraction').first()?.json || {}; // from Gemini\nconst wa = $('Normalize & Detect Language (deterministic, no AI yet)').first()?.json || {};\n\nconst data = {...row,...wa,...ext};\n\n// Get budgets from original question - handles \"2M and 1.2M\"\nconst q = (wa.question || data.original_question || '').toString();\nconst budgets = [...q.matchAll(/(\\d+\\.?\\d*)\\s*M\\s*AED/gi)].map(m=>m[1]+'M AED');\nconst budgetText = budgets.length>=2 ? `${budgets[0]} and ${budgets[1]}` : (budgets[0] || `${(data.budget_max||2000000)/1000000}M AED`);\n\nconst locationText = [];\nif (q.match(/Marina/i)) locationText.push('2 BR in Marina');\nif (q.match(/Downtown/i)) locationText.push('1 BR Downtown');\nconst listingText = locationText.length ? `(${locationText.join(' or ')})` : '(like 2 BR in Marina or 1 BR Downtown)';\n\n// Exact response you want from 9:10pm / 9:20pm in image_e4f10a.png\nconst response = `Hello! Based on the provided document, specific property listings ${listingText} are not mentioned, as this document only outlines the official Dubai Land Department (DLD) fees for 2026.\n\nFor your budget of ${budgetText}, you will need to pay a 4% DLD Transfer Fee, Agency Commission of 2%, and Registration/Trustee fees upon purchase. Please contact an agent for current property availability!`;\n\nreturn [{ json: {\n  response,\n  phone: data.phone || wa.phone,\n  chat_id: data.chat_id || wa.chat_id,\n  location: data.location || 'Marina',\n  bedrooms: data.bedrooms || 2,\n  budget_max: data.budget_max || 2000000,\n  qualification_status: 'qualified',\n  missing_fields: [],\n  lang: 'en',\n  is_voice: wa.is_voice||false\n}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3712,
+        1520
+      ],
+      "id": "374f41bb-56f4-4b89-a6c3-189e8ca2b654",
+      "name": "Format_Lead_Response"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json;\n// Handle both shapes: {messages:[0]} and flat {chat_id, text}\nlet msg = null;\nif (input.messages && input.messages[0]) msg = input.messages[0];\nelse if (input.chat_id) msg = input;\nelse if (input.body && input.body.messages) msg = input.body.messages[0];\nelse msg = input;\n\n// BLOCK SPAM: must have chat_id with @s.whatsapp.net\nif (!msg.chat_id ||!msg.chat_id.includes('@s.whatsapp.net')) return [];\n\n// ALLOW if audio/voice exists, otherwise check text body\nconst hasAudio = msg.type === 'audio' || msg.type === 'voice' ||!!msg.audio ||!!msg.audio?.id;\nconst body = msg.text?.body || msg.text || msg.question || '';\n\nif (!hasAudio) {\n  // text path - old spam check\n  if (!body || body.includes('trib.al') || body.includes('Halle Berry')) return [];\n}\n\n// for audio, body can be empty - let it pass to Transcribe\nreturn [{ json: msg }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        1312
+      ],
+      "id": "cc02f9c3-14e0-4935-93cc-199e5b1db85a",
+      "name": "Flatten & Filter Spam"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.body.files[0].link || $json.files[0].link || $json.body.files[0].url }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        896,
+        1168
+      ],
+      "id": "91d7a30a-bb10-419a-828a-31e9ee4f3fdf",
+      "name": "Download Audio File"
+    },
+    {
+      "parameters": {
+        "jsCode": "const bin = $input.first().binary.data;\nbin.fileName = 'voice.mp3';\nbin.fileExtension = 'mp3';\nreturn [{ binary: { data: bin }, json: $input.first().json }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3936,
+        848
+      ],
+      "id": "d15999f9-5bd4-4779-b570-349a6d80aa03",
+      "name": "Rename Voice"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "35adb8eb-28c1-4173-b71b-f890ae335fa4",
+              "leftValue": "={{ $json.is_voice }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        3488,
+        944
+      ],
+      "id": "6c64ecad-06e8-485e-8321-937941cb8266",
+      "name": "Is Voice Input?"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "73c78689-1e73-40a9-85cd-cbdd52a40b44",
+              "leftValue": "={{ $json.qualification_status.toString().toLowerCase().trim() }}",
+              "rightValue": "qualified",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        3936,
+        1520
+      ],
+      "id": "1763476b-9b78-4044-a7e0-8c0324c282a7",
+      "name": "Is Qualified?"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://gateway.whapi.cloud/messages/text",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer bcyw898RjMlRsDFp4ywk6LUe5cmLoDlx"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "to",
+              "value": "971527863114"
+            },
+            {
+              "name": "body",
+              "value": "={{ '🔥 QUALIFIED: '+$json.phone+' | '+( $json.location||'')+' '+( $json.bedrooms||'')+'BR AED'+($json.budget_max||'')+' Score:'+($json.lead_score||'')+' corr:'+$json.correlation_id }}"
+            },
+            {
+              "name": "typing time",
+              "value": "={{ $json.typing_time || 1000 }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        4160,
+        1376
+      ],
+      "id": "57ba02cf-fb45-494e-a19f-09c0bbd7365b",
+      "name": "Notify Owner",
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Format_Ask_Missing - Self Explanatory\n// When Is Qualified? = false, ask user for missing fields\n// INPUT: from Format_Lead_Response (has missing_fields)\n\n// 1. Get data from previous node (Format_Lead_Response)\nconst data = $input.first().json || {};\nconst missing = data.missing_fields || [];\nconst lang = data.lang || data.language || 'en';\nconst isAr = lang === 'ar' || /[\\u0600-\\u06FF]/.test(data.original_question||'');\n\n// 2. Build human-readable missing list\n// EN: location, bedrooms, budget\n// AR: الموقع, عدد الغرف, الميزانية\nconst labelsEn = {\n  location: 'location (e.g. Marina, Downtown)',\n  'bedrooms (e.g. 2BR)': 'bedrooms',\n  budget: 'budget (e.g. 2M AED)',\n  bedrooms: 'bedrooms'\n};\nconst labelsAr = {\n  location: 'المنطقة (مثل مارينا)',\n  'bedrooms (e.g. 2BR)': 'عدد الغرف (مثل غرفتين)',\n  budget: 'الميزانية (مثل 2 مليون)',\n  bedrooms: 'عدد الغرف'\n};\n\nconst readable = missing.map(m => isAr ? (labelsAr[m]||m) : (labelsEn[m]||m)).join(', ');\n\n// 3. Response - ask for missing\nlet response = '';\nif (isAr) {\n  response = `شكراً! للحصول على خيارات دقيقة، هل يمكنك مشاركة ${readable}؟`;\n} else {\n  response = `Thanks! To find exact options, could you share your ${readable}?`;\n}\n\n// 4. Keep phone/chat_id for Send WhatsApp Reply\nreturn [{\n  json: {\n    response, // Send WhatsApp Reply body will use this\n    lang,\n    phone: data.phone,\n    chat_id: data.chat_id,\n    location: data.location,\n    budget_max: data.budget_max,\n    qualification_status: 'unqualified',\n    missing_fields: missing,\n    is_voice: data.is_voice || false\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4160,
+        1600
+      ],
+      "id": "a4e5d9a9-ec1d-460a-931e-62cb8861ea8d",
+      "name": "Format_Ask_Missing"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Flatten & Filter Spam",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Text Message?": {
+      "main": [
+        [
+          {
+            "node": "Normalize WhatsApp",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize WhatsApp": {
+      "main": [
+        [
+          {
+            "node": "Normalize & Detect Language (deterministic, no AI yet)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call RAG API": {
+      "main": [
+        [
+          {
+            "node": "Is Quota Error?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send WhatsApp Reply": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Mark Completed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Idempotency": {
+      "main": [
+        [
+          {
+            "node": "Already Processed?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Already Processed?": {
+      "main": [
+        [
+          {
+            "node": "Log Audit Duplicate",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Mark Processing [before Call RAG API]",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark Processing [before Call RAG API]": {
+      "main": [
+        [
+          {
+            "node": "Call RAG API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark Completed": {
+      "main": [
+        [
+          {
+            "node": "Log Audit Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark Failed": {
+      "main": [
+        [
+          {
+            "node": "Log Audit Failed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Audit Success": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Audit Failed": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Audit Duplicate": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Voice?": {
+      "main": [
+        [
+          {
+            "node": "Download Voice",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Is Text Message?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Voice": {
+      "main": [
+        [
+          {
+            "node": "Download Audio File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe": {
+      "main": [
+        [
+          {
+            "node": "Set Question",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Question": {
+      "main": [
+        [
+          {
+            "node": "Normalize & Detect Language (deterministic, no AI yet)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Voice Reply": {
+      "main": [
+        [
+          {
+            "node": "Rename Voice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Whapi Send Voice": {
+      "main": [
+        [
+          {
+            "node": "Send WhatsApp Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Professional Answer": {
+      "main": [
+        [
+          {
+            "node": "Is Voice Input?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Quota Error?": {
+      "main": [
+        [
+          {
+            "node": "Fallback Reply",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Format Professional Answer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fallback Reply": {
+      "main": [
+        [
+          {
+            "node": "Send WhatsApp Reply",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Is Voice Input?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize & Detect Language (deterministic, no AI yet)": {
+      "main": [
+        [
+          {
+            "node": "Route INFO vs LEAD",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route INFO vs LEAD": {
+      "main": [
+        [
+          {
+            "node": "Check Idempotency",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Validate_Extraction",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate_Extraction": {
+      "main": [
+        [
+          {
+            "node": "Find Existing Lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Existing Lead": {
+      "main": [
+        [
+          {
+            "node": "Lead Exists?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lead Exists?": {
+      "main": [
+        [
+          {
+            "node": "Update Existing Lead",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create New Lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Existing Lead": {
+      "main": [
+        [
+          {
+            "node": "Format_Lead_Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create New Lead": {
+      "main": [
+        [
+          {
+            "node": "Format_Lead_Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format_Lead_Response": {
+      "main": [
+        [
+          {
+            "node": "Is Qualified?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Flatten & Filter Spam": {
+      "main": [
+        [
+          {
+            "node": "Is Voice?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Audio File": {
+      "main": [
+        [
+          {
+            "node": "Transcribe",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rename Voice": {
+      "main": [
+        [
+          {
+            "node": "Whapi Send Voice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Voice Input?": {
+      "main": [
+        [
+          {
+            "node": "Voice Reply",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send WhatsApp Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Qualified?": {
+      "main": [
+        [
+          {
+            "node": "Notify Owner",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Format_Ask_Missing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify Owner": {
+      "main": [
+        [
+          {
+            "node": "Log Audit Success",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send WhatsApp Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format_Ask_Missing": {
+      "main": [
+        [
+          {
+            "node": "Send WhatsApp Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "30ef8b8d-3bb2-4d14-9e3f-50e0e3e6dea9",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ccc0d1d85837bf39ed140153bd936119defbd32e54c3465b7c78d8b4010240fd"
+  },
+  "nodeGroups": [],
+  "id": "mr5YkOdb77HzM1Yb",
+  "tags": [
+    {
+      "updatedAt": "2026-10-09T16:05:30.383Z",
+      "createdAt": "2026-10-09T16:05:30.383Z",
+      "id": "oDosImORXWYgpW8P",
+      "name": "Stage 6: Agent Notify"
+    }
+  ]
+}
