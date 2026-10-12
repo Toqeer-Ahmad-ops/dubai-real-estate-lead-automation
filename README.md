@@ -110,25 +110,25 @@ FROM (SELECT 53 as grounded_count, 5 as fallback_count) t;
 ![Execution Overview](docs/screenshots/workflow-4k-1.png)
 
 ### 4. Find Existing Lead Detail 4K – Phone Filter Fix phone || Webhook
-![Find Existing Lead Detail](docs/screenshots/workflow-4k-2.png)
+![Find Existing Lead Detail](docs/screenshots/workflow-4k-2.jpg)
 
 ### 5. RAG Evaluation 91.4% – 53 grounded / 5 fallback – Production Proof
-![91.4 Grounded Rate](docs/screenshots/rag-evaluation-91-4.png)
+![91.4 Grounded Rate](docs/screenshots/rag-evaluation-91-4.jpg)
 
 ### 6. INFO – Damac Hills 2 Payment Plan 10% down + Oct 2024 + Apr 2025 + 20% at 40% + 40% Dec 2026
-![Damac Hills 2 INFO](docs/screenshots/info-damac-hills-2.png)
+![Damac Hills 2 INFO](docs/screenshots/info-damac-hills-2.jpg)
 
 ### 7. INFO – 【entity-DLD¦canonical_name=DLD】 1.5M = 60k + Community Rules Storage + AR Voice
-![【entity-DLD¦canonical_name=DLD】 1.5M INFO](docs/screenshots/info-dld-15m-storage-ar.png)
+![【entity-DLD¦canonical_name=DLD】 1.5M INFO](docs/screenshots/info-dld-15m-storage-ar.jpg)
 
 ### 8. LEAD – Dynamic Budget 1.8M + 2.2M Template Not Hardcoded
-![LEAD Dynamic Budget](docs/screenshots/lead-dynamic-budget-18m-22m.png)
+![LEAD Dynamic Budget](docs/screenshots/lead-dynamic-budget-18m-22m.jpg)
 
 ### 9. Supabase Schema – rag_audit_logs Real Columns 11 rows
-![Schema rag_audit_logs](docs/screenshots/supabase-rag-audit-logs-schema.png)
+![Schema rag_audit_logs](docs/screenshots/supabase-rag-audit-logs-schema.jpg)
 
 ### 10. Bug Highlight – Hardcoded Filter Before Fix
-![Hardcoded Filter Bug](docs/screenshots/bug-hardcoded-filter.png)
+![Hardcoded Filter Bug](docs/screenshots/bug-hardcoded-filter.jpg)
 
 ---
 
