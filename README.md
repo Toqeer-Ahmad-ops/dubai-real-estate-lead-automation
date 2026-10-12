@@ -103,10 +103,10 @@ FROM (SELECT 53 as grounded_count, 5 as fallback_count) t;
 ### 1. Architecture 4K – Persistence + Scoring – Gemini 3.5 Flash Corrected (Main)
 ![Architecture 4K](docs/screenshots/architecture-day8-gemini-3-5-flash-corrected.jpg)
 
-### 2. Stitched Workflow 4K – Wiring Fix ID#1884 Before/After – LinkedIn Hero
+### 2. Stitched Workflow 4K – Wiring Fix ID#1884 Before/After  LinkedIn Hero
 ![Stitched Workflow 4K](docs/screenshots/workflow-stitched-4k-linkedin.png)
 
-### 3. Production Workflow 4K – Execution Overview Error 5.739s ID#1884
+### 3. Production Workflow 
 ![Execution Overview](docs/screenshots/workflow-4k-1.png)
 
 ### 4. Find Existing Lead Detail 4K – Phone Filter Fix phone || Webhook
