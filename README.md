@@ -12,7 +12,7 @@
 
 Production-grade WhatsApp RAG Bot for Dubai Real Estate — Voice notes (0:02) + Text → Transcription (Groq Whisper) → Qdrant RAG → Professional answers ✅💰📄 + **AI Lead Intake, Qualification & Persistence** with deterministic scoring and merge-preserve logic
 
-> Day 8/23 of 30-Day AI Sprint | 91.4% grounded_rate (53/58) | 2.3s EN / 2.4s AR | 0.822 similarity | Repeat customer preserve fix | Dynamic filter not hardcoded
+> Day 8/23 of 23-Day AI Sprint | 91.4% grounded_rate (53/58) | 2.3s EN / 2.4s AR | 0.822 similarity | Repeat customer preserve fix | Dynamic filter not hardcoded
 
 ---
 
