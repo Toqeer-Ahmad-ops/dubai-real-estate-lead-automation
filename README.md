@@ -100,7 +100,7 @@ FROM (SELECT 53 as grounded_count, 5 as fallback_count) t;
 
 ## 📸 Screenshots
 
-### 1. Architecture 4K – Persistence + Scoring – Gemini 3.5 Flash Corrected (Main)
+### 1. Workflow– Persistence + Scoring – Gemini 3.5 Flash Corrected (Main)
 ![Architecture 4K](docs/screenshots/architecture-day8-gemini-3-5-flash-corrected.jpg)
 
 ### 2. Stitched Workflow 4K – Wiring Fix ID#1884 Before/After  LinkedIn Hero
